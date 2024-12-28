@@ -7,7 +7,8 @@ import {
     ProvidedRoonServices,
     RequestedRoonServices,
     RoonApiTransportOutputs,
-    RoonApiTransportZones
+    RoonApiTransportZones,
+    WSConnectOptions
 } from './interfaces';
 import { RoonKit } from './RoonKit';
 import EventEmitter from "events";
@@ -110,32 +111,29 @@ export class RoonExtension extends EventEmitter {
     }
 
     /**
-     * Initializes the extensions services and begins discovery.
+     * Initializes the extension's services and begins discovery.
      * @param provided_services Optional. Additional services provided by extension. RoonApiState is already provided so DO NOT add this service.
      */
     public start_discovery(provided_services: ProvidedRoonServices[] = []): void {
-        if (this._core) {
-            throw new Error(`RoonExtension: Discovery has already been started.`);
-        }
+        this.instantiateCore();
 
-        // Initialize transient object for to hold paired core
-        this._core = new TransientObject();
-
-        // Add RoonApiStatus to list of provided services.
-        provided_services.push(this._status);
-
-        // Build list of required & optional services.
-        const required_services: {new (): RequestedRoonServices}[] = [];
-        const optional_services: {new (): RequestedRoonServices}[] = [];
-        this.requireService(this._options.RoonApiBrowse, RoonKit.RoonApiBrowse, required_services, optional_services);
-        this.requireService(this._options.RoonApiImage, RoonKit.RoonApiImage, required_services, optional_services);
-        this.requireService(this._options.RoonApiTransport, RoonKit.RoonApiTransport, required_services, optional_services);
+        this.initializeServices(provided_services);
         
-        // Initialize services
-        this._api.init_services({ required_services, optional_services, provided_services });
-
         // Start discovery
         this._api.start_discovery();
+    }
+
+    /**
+     * Initializes the extension's services and attempts to pair with a Roon core via Websocket
+     * @param options Websocket connection options.
+     * @param provided_services Optional. Additional services provided by extension. RoonApiState is already provided so DO NOT add this service.
+     */
+    public ws_connect(options: WSConnectOptions, provided_services: ProvidedRoonServices[] = []) {
+        this.instantiateCore();
+
+        this.initializeServices(provided_services);
+
+        this._api.ws_connect(options);
     }
 
     /**
@@ -164,7 +162,7 @@ export class RoonExtension extends EventEmitter {
      * Used primarily by additional components that want to ensure the services they depend on are
      * initialized.
      * 
-     * Can only be called before `start_discover()` is called.
+     * Can only be called before `start_discovery()` is called.
      * @param options Options to apply.
      */
     public update_options(options: Partial<RoonExtensionOptions>): void {
@@ -203,5 +201,30 @@ export class RoonExtension extends EventEmitter {
                     break;
             }
         }
+    }
+
+    private instantiateCore() {
+        if (this._core) {
+            throw new Error(`RoonExtension: Discovery has already been started.`);
+        }
+
+        // Initialize transient object for to hold paired core
+        this._core = new TransientObject();
+    }
+    
+    private initializeServices(provided_services: ProvidedRoonServices[]) {
+        // Add RoonApiStatus to list of provided services.
+        provided_services.push(this._status);
+
+        // Build list of required & optional services.
+        const required_services: {new (): RequestedRoonServices}[] = [];
+        const optional_services: {new (): RequestedRoonServices}[] = [];
+        this.requireService(this._options.RoonApiBrowse, RoonKit.RoonApiBrowse, required_services, optional_services);
+        this.requireService(this._options.RoonApiImage, RoonKit.RoonApiImage, required_services, optional_services);
+        this.requireService(this._options.RoonApiTransport, RoonKit.RoonApiTransport, required_services, optional_services);
+        
+        // Initialize services
+        this._api.init_services({ required_services, optional_services, provided_services });
+
     }
 }
