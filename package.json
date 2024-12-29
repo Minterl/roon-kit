@@ -1,13 +1,12 @@
 {
-  "name": "build",
+  "name": "roon-kit",
   "version": "0.1.0",
-  "description": "Build scripts for roon-kit",
-  "main": "index.js",
+  "description": "Collection of utility classes that simplify building extensions for Roon.",
+  "main": "bin/index.js",
+  "typings": "bin/index.d.ts",
   "scripts": {
-    "install": "lerna bootstrap --hoist",
-    "build": "lerna run build",
-    "build:docs": "npx typedoc",
-    "test": "lerna run test"
+    "build": "tsc -p tsconfig.json",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -22,9 +21,15 @@
     "url": "https://github.com/Stevenic/roon-kit/issues"
   },
   "homepage": "https://github.com/Stevenic/roon-kit#readme",
+  "dependencies": {
+    "node-roon-api"           : "github:roonlabs/node-roon-api",
+    "node-roon-api-browse"    : "github:roonlabs/node-roon-api-browse",
+    "node-roon-api-image"     : "github:roonlabs/node-roon-api-image",
+    "node-roon-api-settings"  : "github:roonlabs/node-roon-api-settings",
+    "node-roon-api-status"    : "github:roonlabs/node-roon-api-status",
+    "node-roon-api-transport"	: "github:roonlabs/node-roon-api-transport"
+  },
   "devDependencies": {
-    "lerna": "^4.0.0",
-    "typedoc": "^0.22.15",
-    "typescript": "^4.6.4"
+    "@types/node": "^17.0.33"
   }
 }

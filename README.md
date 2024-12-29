@@ -99,19 +99,3 @@ Or using a more modern async/await pattern:
     extension.set_status(`core paired`);
 })();
 ``` 
-
-## Building Packages and Samples
-
-First ensure that you have the latest versions of [node.js](https://nodejs.org/) and [git](https://git-scm.com/downloads) installed. Next open a command window and clone the roon-kit repository to a local source directory:
-
-```bash
-$ git clone https://github.com/Stevenic/roon-kit
-```
-
-Next move to the cloned directory then install all package dependencies and build:
-
-```bash
-$ cd roon-kit
-$ npm install
-$ npm run build
-```
