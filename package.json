@@ -4,7 +4,6 @@
   "description": "Build scripts for roon-kit",
   "main": "index.js",
   "scripts": {
-    "install": "lerna bootstrap --hoist",
     "build": "lerna run build",
     "build:docs": "npx typedoc",
     "test": "lerna run test"
